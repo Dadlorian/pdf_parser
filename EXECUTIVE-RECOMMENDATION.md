@@ -28,6 +28,46 @@ You have **3 viable paths forward**:
 - Visual debugging tools
 - Requires Python runtime + IPC complexity
 
+```mermaid
+graph TD
+    A{Choose PDF Redlining<br/>Architecture} --> B{Can you accept<br/>external runtime<br/>dependencies?}
+
+    B -->|Yes, Java OK| C[Option 1: Apache Tika Hybrid ⭐]
+    B -->|Yes, Python OK| D[Option 3: PDFPlumber]
+    B -->|No, Pure JS only| E[Option 2: Custom V3]
+
+    C --> C1[Effort: 2-3 weeks]
+    C1 --> C2[Risk: Low]
+    C2 --> C3[Payoff: High]
+    C3 --> C4[Bonus: Universal Docs]
+
+    D --> D1[Effort: 3-4 weeks]
+    D1 --> D2[Risk: Medium]
+    D2 --> D3[Payoff: High]
+    D3 --> D4[Best for Tables]
+
+    E --> E1[Effort: 4-6 weeks]
+    E1 --> E2[Risk: Medium]
+    E2 --> E3[Payoff: Medium-High]
+    E3 --> E4[Full Control]
+
+    C4 --> F{Start POC}
+    D4 --> F
+    E4 --> F
+
+    F --> G[Validate Approach]
+    G --> H{Success?}
+    H -->|Yes| I[Proceed to Production]
+    H -->|No| J[Pivot to Alternative]
+
+    style C fill:#d4edda
+    style C1 fill:#d4edda
+    style C2 fill:#d4edda
+    style C3 fill:#d4edda
+    style I fill:#d4edda
+    style J fill:#f8d7da
+```
+
 ---
 
 ## Why Option 1 (Tika Hybrid) is Recommended
@@ -375,6 +415,34 @@ Week 3: Integration into existing UI
 
 Week 4 (optional): Universal document conversion
   └─ Add DOCX, PPTX, HTML support
+```
+
+```mermaid
+graph LR
+    A[Week 1: Tika POC] --> B{POC Success?}
+    B -->|Yes, 95%+ coverage| C[Week 2: Hybrid Mapping]
+    B -->|No| D[Pivot to V3 Architecture]
+
+    C --> E{Mapping Accuracy?}
+    E -->|90%+ accuracy| F[Week 3: Integration]
+    E -->|Less than 90%| G[Add Fuzzy Matching]
+    G --> E
+
+    F --> H[Deploy and Test]
+    H --> I[Week 4: Universal Docs]
+    I --> J[Add DOCX Support]
+    I --> K[Add PPTX Support]
+    I --> L[Add HTML Support]
+
+    D --> M[Implement V3<br/>Multi-Pass Architecture]
+    M --> N[4-6 weeks development]
+
+    style A fill:#e1f5ff
+    style C fill:#d4edda
+    style F fill:#d4edda
+    style H fill:#d4edda
+    style D fill:#fff3cd
+    style M fill:#fff3cd
 ```
 
 **Success Metrics:**

@@ -290,6 +290,55 @@ pdfToText.pdfToText('document.pdf', { layout: 'layout' }, (err, data) => {
 └──────────────────────────────────────────────────────────┘
 ```
 
+```mermaid
+graph TD
+    A[User Uploads Document] --> B{STAGE 1: Format Detection}
+
+    B -->|.docx| C[DOCX Converter]
+    B -->|.pptx| D[PPTX Converter]
+    B -->|.rtf| E[RTF Converter]
+    B -->|.html| F[HTML Converter]
+    B -->|.md| G[Markdown Converter]
+    B -->|.txt| H[Text Converter]
+    B -->|.pdf| I[Pass Through]
+
+    C --> C1[LibreOffice Convert]
+    D --> D1[LibreOffice Convert]
+    E --> E1[Pandoc Convert]
+    F --> F1[Puppeteer Convert]
+    G --> G1[Pandoc Convert]
+    H --> H1[PDFKit Convert]
+
+    C1 --> J[Normalized PDF]
+    D1 --> J
+    E1 --> J
+    F1 --> J
+    G1 --> J
+    H1 --> J
+    I --> J
+
+    J --> K[STAGE 3: PDF Parsing]
+    K --> K1[Apache Tika: Extract Structure]
+    K --> K2[PDF.js: Extract Coordinates]
+    K1 --> K3[Map Paragraphs to Coordinates]
+    K2 --> K3
+    K3 --> K4[Structured Sections with BBoxes]
+
+    K4 --> L[STAGE 4: Redlining UI]
+    L --> L1[Render PDF]
+    L1 --> L2[Overlay Section Boxes P1, P2, P3...]
+    L2 --> L3[Enable Redlining Interactions]
+    L3 --> M[Annotated Document]
+
+    style A fill:#e1f5ff
+    style B fill:#fff3cd
+    style J fill:#f3e5f5
+    style K fill:#e8f5e9
+    style K1 fill:#ffd54f
+    style L fill:#fce4ec
+    style M fill:#d4edda
+```
+
 ---
 
 ### Format-Specific Converters
@@ -1022,6 +1071,41 @@ services:
 - Implement UniversalDocumentConverter
 - Support DOCX, PPTX, HTML, Markdown, RTF
 - Convert to PDF, then parse with unified pipeline
+
+```mermaid
+graph TD
+    A[PDF Parsing Approaches] --> B[V2 Current]
+    A --> C[V3 Multi-Pass]
+    A --> D[Tika Hybrid]
+    A --> E[PDFPlumber]
+
+    B --> B1[Gap Heuristics]
+    B1 --> B2[50-80% Miss Rate ❌]
+
+    C --> C1[Percentile-Based Blocks]
+    C1 --> C2[4-6 weeks dev ⚠️]
+    C2 --> C3[95% Coverage ✅]
+
+    D --> D1[AI Layout Analysis]
+    D1 --> D2[2-3 weeks dev ✅]
+    D2 --> D3[95%+ Coverage ✅]
+    D3 --> D4[Universal Docs ✅]
+
+    E --> E1[Best Table Detection]
+    E1 --> E2[3-4 weeks dev ⚠️]
+    E2 --> E3[Python IPC ⚠️]
+
+    D4 --> F[RECOMMENDED ⭐]
+
+    style B2 fill:#f8d7da
+    style C3 fill:#d4edda
+    style D fill:#d4edda
+    style D1 fill:#ffd54f
+    style D2 fill:#d4edda
+    style D3 fill:#d4edda
+    style D4 fill:#d4edda
+    style F fill:#d4edda
+```
 
 ---
 
