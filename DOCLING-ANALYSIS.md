@@ -115,6 +115,52 @@ INPUT: PDF file
 └──────────────────────────────────────────────────────┘
 ```
 
+```mermaid
+graph TD
+    A[PDF File Input] --> B[STEP 1: Extract Text + Coordinates]
+
+    B --> B1[Parse PDF tokens]
+    B1 --> B2[Capture bounding boxes]
+    B2 --> B3[Text items with coordinates]
+
+    B3 --> C[STEP 2: AI Layout Analysis]
+    C --> C1[Computer Vision Models]
+    C1 --> C2[Identify Paragraphs]
+    C1 --> C3[Identify Section Headers]
+    C1 --> C4[TableFormer: Detect Tables]
+    C1 --> C5[Identify Lists]
+    C1 --> C6[Identify Figures/Code/Formulas]
+    C2 --> C7[Determine Reading Order]
+    C3 --> C7
+    C4 --> C7
+    C5 --> C7
+    C6 --> C7
+    C7 --> C8[Structured Document Tree]
+
+    C8 --> D[STEP 3: Structure Reconstruction]
+    D --> D1[Build Hierarchical Structure]
+    D1 --> D2[Preserve Element Types]
+    D2 --> D3[Maintain Geometric Info]
+    D3 --> D4[JSON with Structure + Coordinates]
+
+    D4 --> E[STEP 4: Export Formats]
+    E --> E1[JSON: Lossless + Metadata]
+    E --> E2[Markdown: Human-Readable]
+    E --> E3[HTML: Web Rendering]
+    E --> E4[DocTags: Custom Format]
+
+    E1 --> F[Ready for Redlining App]
+    E2 --> F
+    E3 --> F
+    E4 --> F
+
+    style A fill:#e1f5ff
+    style C1 fill:#ffd54f
+    style C4 fill:#ffd54f
+    style D4 fill:#d4edda
+    style F fill:#d4edda
+```
+
 ---
 
 ## Docling Output Format
@@ -296,6 +342,46 @@ User Uploads PDF
 │                                                      │
 │  No need for complex parsing in browser!            │
 └──────────────────────────────────────────────────────┘
+```
+
+```mermaid
+graph TD
+    A[User Uploads PDF] --> B[Python Service: Docling Parser]
+
+    B --> B1[Initialize DocumentConverter]
+    B1 --> B2[converter.convert PDF]
+    B2 --> B3[AI Layout Analysis + Extraction]
+    B3 --> B4[Export to JSON Dictionary]
+    B4 --> B5[JSON with Sections + BBoxes]
+
+    B5 --> C[Node.js API: Transform Layer]
+    C --> C1[Parse Docling JSON]
+    C1 --> C2{For each page element}
+    C2 --> C3[Extract type, text, bbox]
+    C3 --> C4[Assign reading order: P1, P2, P3...]
+    C4 --> C5[Format as Redlining JSON]
+    C5 --> C6[Return API Response]
+
+    C6 --> D[Frontend: Redlining UI]
+    D --> D1[Receive sections JSON from API]
+    D1 --> D2[Render PDF with PDF.js]
+    D2 --> D3[Overlay section bounding boxes]
+    D3 --> D4[Label sections: P1, P2, P3...]
+    D4 --> D5{User Interaction}
+    D5 -->|Click| D6[Highlight/Strike-through]
+    D5 -->|Comment| D7[Add annotation: Delete P7]
+    D5 -->|Reference| D8[Link to section by number]
+
+    D6 --> D9[Updated Document with Redlines]
+    D7 --> D9
+    D8 --> D9
+
+    style A fill:#e1f5ff
+    style B fill:#fff3cd
+    style B3 fill:#ffd54f
+    style C fill:#f3e5f5
+    style D fill:#e8f5e9
+    style D9 fill:#d4edda
 ```
 
 ### Why This is Better Than Alternatives

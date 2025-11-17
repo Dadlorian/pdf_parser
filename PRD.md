@@ -100,6 +100,51 @@ Current system misses 50-80% of document content OR over-segments into unusable 
 └─────────────────────────────────────┘
 ```
 
+```mermaid
+graph TD
+    A[PDF Input] --> B[1. Document Signature Learning]
+    B --> B1[K-means clustering for spacing]
+    B1 --> B2[Calculate typical line spacing ~14px]
+    B1 --> B3[Calculate paragraph spacing ~21px]
+    B1 --> B4[Identify dominant font size ~12px]
+    B1 --> B5[Find common left margins]
+
+    B --> C[2. Column Detection]
+    C --> C1[X-position clustering]
+    C1 --> C2{Multi-column?}
+    C2 -->|Yes| C3[Calculate column boundary]
+    C2 -->|No| C4[Single column mode]
+
+    C --> D[3. Element Classification]
+    D --> D1{Text Pattern Analysis}
+    D1 -->|Numbered/Large Font/ALL CAPS| D2[section-header]
+    D1 -->|Bullet markers| D3[bullet-item]
+    D1 -->|Pipe characters| D4[table-row]
+    D1 -->|Default| D5[body-paragraph]
+
+    D --> E[4. Human Reading Order Parser]
+    E --> E1[Iterate text items in order]
+    E1 --> E2{shouldStartNewSection?}
+    E2 -->|Yes| E3[Start new section]
+    E2 -->|No| E4[Add to current section]
+    E3 --> E5[Group lines into sections]
+    E4 --> E5
+
+    E --> F[5. Conflict Resolution]
+    F --> F1[Detect overlapping boxes]
+    F1 --> F2[Merge conflicts]
+    F2 --> F3[Renumber reading order]
+    F3 --> G[Final Sections P1, P2, P3...]
+
+    style A fill:#e1f5ff
+    style G fill:#d4edda
+    style B fill:#fff3cd
+    style C fill:#fff3cd
+    style D fill:#fff3cd
+    style E fill:#fff3cd
+    style F fill:#fff3cd
+```
+
 ### Key Algorithms
 
 **K-Means Clustering (Gap Analysis):**
@@ -525,11 +570,64 @@ Document
       └─ ...
 ```
 
+```mermaid
+graph TD
+    A[Document] --> B[Column: Left]
+    A --> C[Column: Right]
+
+    B --> D[Header Block]
+    B --> E[Paragraph Block]
+    B --> F[List Block]
+
+    D --> G[Section 1: header]
+    E --> H[Section 2: paragraph]
+    E --> I[Section 3: paragraph]
+    F --> J[Section 4: bullet]
+    F --> K[Section 5: bullet]
+    F --> L[Section 6: bullet]
+
+    C --> M[...]
+
+    style A fill:#e1f5ff
+    style B fill:#fff3cd
+    style C fill:#fff3cd
+    style D fill:#fce4ec
+    style E fill:#f3e5f5
+    style F fill:#e8f5e9
+```
+
 ### Approach E: Hybrid Geometric + Semantic
 - Use geometric analysis for structure
 - Use NLP/patterns for semantic understanding
 - Example: Recognize "Dear X" → letter salutation → new section
 - Example: Detect bullet patterns → group list → split by bullets
+
+```mermaid
+graph LR
+    A[Text Analysis] --> B[Geometric Analysis]
+    A --> C[Semantic Analysis]
+
+    B --> D[Whitespace Detection]
+    B --> E[Font Size Analysis]
+    B --> F[Position Clustering]
+
+    C --> G[Pattern Recognition]
+    C --> H[NLP Understanding]
+    C --> I[Context Awareness]
+
+    D --> J[Hybrid Decision Engine]
+    E --> J
+    F --> J
+    G --> J
+    H --> J
+    I --> J
+
+    J --> K[Section Boundaries]
+
+    style A fill:#e1f5ff
+    style J fill:#ffd54f
+    style K fill:#d4edda
+```
 
 ---
 

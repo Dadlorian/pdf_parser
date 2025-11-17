@@ -64,6 +64,75 @@ Current approach tries to solve both simultaneously with gap thresholds → FAIL
 └─────────────────────────────────────────────────────────┘
 ```
 
+```mermaid
+graph TD
+    A[PDF Input] --> B[PASS 1: Document Analysis]
+
+    B --> B1[Extract text items from PDF.js]
+    B1 --> B2[Calculate gap percentiles<br/>p25, p50, p75, p90]
+    B2 --> B3[Identify dominant font size]
+    B3 --> B4[Find common left margins]
+    B4 --> B5{Multi-column<br/>layout?}
+    B5 -->|Yes| B6[Detect column boundaries]
+    B5 -->|No| B7[Single column mode]
+    B6 --> B8[Document Signature]
+    B7 --> B8
+
+    B8 --> C[PASS 2: Visual Block Detection]
+    C --> C1[Use p75 gap as block boundary]
+    C1 --> C2{For each gap<br/>between items}
+    C2 -->|gap >= p75| C3[Start new block]
+    C2 -->|gap < p75| C4[Continue current block]
+    C3 --> C5[Array of Visual Blocks]
+    C4 --> C5
+
+    C5 --> D[PASS 3: Block Classification]
+    D --> D1{Score each block<br/>against types}
+    D1 --> D2[Score: section-header]
+    D1 --> D3[Score: body-paragraph]
+    D1 --> D4[Score: bullet-list]
+    D1 --> D5[Score: table]
+    D1 --> D6[Score: numbered-list]
+    D2 --> D7[Select highest score]
+    D3 --> D7
+    D4 --> D7
+    D5 --> D7
+    D6 --> D7
+    D7 --> D8[Typed Blocks with Confidence]
+
+    D8 --> E[PASS 4: Block Decomposition]
+    E --> E1{Block Type?}
+    E1 -->|section-header| E2[Keep as single section]
+    E1 -->|body-paragraph| E3[Split if internal gaps large]
+    E1 -->|bullet-list| E4[Split by bullet markers]
+    E1 -->|numbered-list| E5[Split by numbers]
+    E1 -->|table| E6[Keep whole or split by rows]
+    E2 --> E7[Array of Sections]
+    E3 --> E7
+    E4 --> E7
+    E5 --> E7
+    E6 --> E7
+
+    E7 --> F[PASS 5: Reading Order & Validation]
+    F --> F1{Multi-column?}
+    F1 -->|Yes| F2[Sort left column by Y<br/>then right column by Y]
+    F1 -->|No| F3[Sort all by Y position]
+    F2 --> F4[Assign P1, P2, P3...]
+    F3 --> F4
+    F4 --> F5[Validate coverage >= 95%]
+    F5 --> F6[Detect overlaps]
+    F6 --> F7[Calculate confidence scores]
+    F7 --> G[Final Numbered Sections]
+
+    style A fill:#e1f5ff
+    style B fill:#fff3cd
+    style C fill:#f3e5f5
+    style D fill:#e8f5e9
+    style E fill:#fce4ec
+    style F fill:#fff3cd
+    style G fill:#d4edda
+```
+
 ---
 
 ## Pass 1: Document Analysis & Signature Learning
